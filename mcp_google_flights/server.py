@@ -262,6 +262,12 @@ def search_airports(query: str, limit: int = 8) -> list[dict[str, str]]:
     Use antes de `search_flights` sempre que o usuário informar um nome de cidade
     ou de aeroporto em vez do código IATA de 3 letras.
 
+    A base de dados só tem nomes de lugares em inglês. As cidades mais comuns
+    (Lisboa, Londres, Roma, Nova York, Moscou etc.) já têm tradução automática
+    embutida. Se a busca em português não retornar nada, tente de novo com o
+    nome da cidade em inglês antes de concluir que não existe (ex.: "Munique"
+    -> "Munich", "Praga" -> "Prague").
+
     Args:
         query: Texto livre — código IATA, nome do aeroporto ou nome da cidade.
         limit: Número máximo de resultados.
