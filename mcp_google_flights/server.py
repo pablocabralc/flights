@@ -42,6 +42,10 @@ def _serialize(flight: Flights, currency: str) -> dict[str, Any]:
         "currency": currency,
         "airlines": list(flight.airlines),
         "stops": max(len(legs) - 1, 0),
+        # The actual airport used, which can differ from the requested code
+        # when a multi-airport metro code (e.g. "NYC") was searched.
+        "origin_airport": legs[0].from_airport.code if legs else None,
+        "destination_airport": legs[-1].to_airport.code if legs else None,
         "connecting_airports": [leg.to_airport.code for leg in legs[:-1]],
         "duration_minutes": _total_duration(flight),
         "departure": iso_datetime(legs[0].departure) if legs else None,
@@ -202,6 +206,14 @@ def search_flights(
     chame antes a tool `search_airports` para descobrir o código correto — não
     tente adivinhar.
 
+    Cidades com múltiplos aeroportos (Nova York, Londres, Paris, Milão,
+    Moscou, São Paulo etc.): `search_airports` já devolve o grupo inteiro
+    (ex.: JFK, LGA, EWR) e um `metro_code` (ex.: "NYC"). Passar esse
+    `metro_code` diretamente em `from_airport`/`to_airport` busca em todos os
+    aeroportos da região de uma vez só — é assim que o próprio Google Flights
+    funciona. Nesse caso, confira `origin_airport`/`destination_airport` em
+    cada voo retornado para saber qual aeroporto específico foi usado.
+
     Datas: formato ISO "YYYY-MM-DD" (ex.: "2026-10-06"). Informe `return_date`
     apenas para ida e volta; deixe em branco para somente ida.
 
@@ -232,8 +244,9 @@ def search_flights(
 
     Returns:
         Dicionário com `count`, `cheapest_price`, `currency`, `query`
-        (parâmetros normalizados), `flights` (lista ordenada por preço) e `html`
-        (página completa e pronta para exibição).
+        (parâmetros normalizados), `flights` (lista ordenada por preço, cada
+        um com `origin_airport`/`destination_airport`) e `html` (página
+        completa e pronta para exibição).
     """
     return _do_search_flights(
         from_airport=from_airport,
@@ -268,12 +281,22 @@ def search_airports(query: str, limit: int = 8) -> list[dict[str, str]]:
     nome da cidade em inglês antes de concluir que não existe (ex.: "Munique"
     -> "Munich", "Praga" -> "Prague").
 
+    Cidades com múltiplos aeroportos: buscar pelo nome da cidade (ex.: "Nova
+    York", "Londres", "São Paulo") já devolve TODOS os aeroportos da região
+    de uma vez, cada um com um `metro_code` (ex.: "NYC") — não é preciso
+    escolher um aeroporto específico nem chamar essa tool de novo por
+    aeroporto. Passe esse `metro_code` direto em `search_flights` para
+    buscar em todos ao mesmo tempo, ou escolha um `code` individual da lista
+    se o usuário pedir um aeroporto específico.
+
     Args:
         query: Texto livre — código IATA, nome do aeroporto ou nome da cidade.
         limit: Número máximo de resultados.
 
     Returns:
-        Lista de dicionários com `code`, `name`, `city` e `country`.
+        Lista de dicionários com `code`, `name`, `city`, `country`,
+        `city_code` e, quando a cidade tem mais de um aeroporto,
+        `metro_code` (igual ao `city_code`, utilizável em `search_flights`).
     """
     return _search_airports(query, limit)
 
