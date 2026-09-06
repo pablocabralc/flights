@@ -1,0 +1,5 @@
+docs/
+tests/
+scripts/
+enums/generate_enums.py
+enums/_generated_enum.py
