@@ -242,6 +242,14 @@ def search_flights(
         checked_bags: Bagagens despachadas a considerar na estimativa de preço.
         max_price: Preço máximo na moeda selecionada.
 
+    Exibição: o campo `html` é uma página completa e independente (inclui seu
+    próprio <style>), pronta para o usuário ver a lista de voos formatada em
+    vez de texto corrido. Se o seu ambiente tiver a funcionalidade de
+    Artifacts/canvas (claude.ai, Claude Desktop, Claude Code), crie um
+    artifact HTML com esse conteúdo e apresente-o — não copie o HTML como
+    texto na conversa. Se Artifacts não estiver disponível, resuma os dados
+    de `flights` em texto normalmente.
+
     Returns:
         Dicionário com `count`, `cheapest_price`, `currency`, `query`
         (parâmetros normalizados), `flights` (lista ordenada por preço, cada
