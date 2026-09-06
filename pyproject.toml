@@ -21,7 +21,8 @@ requires-python = ">=3.10"
 dependencies = [
   "primp",
   "protobuf>=5.27.0",
-  "selectolax"
+  "selectolax",
+  "mcp[cli]"
 ]
 
 [project.optional-dependencies]
@@ -36,7 +37,8 @@ local = [
 
 [tool.setuptools]
 packages = [
-    "fast_flights"
+    "fast_flights",
+    "mcp_google_flights"
 ]
 
 [tool.pyright]
